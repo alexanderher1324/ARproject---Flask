@@ -24,9 +24,13 @@ A Flask-based social media scheduler web app that allows users to:
 1. Create and activate a virtual environment.
 2. Install dependencies:
    ```bash
-   pip install Flask Flask-WTF Flask-Login Flask-SQLAlchemy
+   pip install -r requirements.txt
    ```
-3. Set environment variables:
+3. Copy `.env.example` to `.env` and update the values:
+   ```bash
+   cp .env.example .env
+   ```
+   Set environment variables inside `.env`:
    - `SECRET_KEY` – **required** secret key for Flask sessions. The app exits if this is not provided.
    - `DATABASE_URL` – (optional) SQLAlchemy connection string. Defaults to SQLite `app.db`.
 4. Run the development server:

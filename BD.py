@@ -5,6 +5,9 @@ from flask_wtf import CSRFProtect
 from flask_login import LoginManager, login_required, current_user
 from auth import auth
 from models import db, User, Post
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__, template_folder='UI')
 
