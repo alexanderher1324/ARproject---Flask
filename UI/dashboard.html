@@ -13,7 +13,7 @@
             <li><a href="{{ url_for('view_past_posts') }}">View Past Posts</a></li>
             <li>
                 <form method="POST" action="{{ url_for('auth.logout') }}">
-                    {{ csrf_token() }}
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                     <button type="submit">Logout</button>
                 </form>
             </li>
