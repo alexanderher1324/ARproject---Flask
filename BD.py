@@ -9,6 +9,13 @@ app = Flask(__name__, template_folder='UI')
 
 app.secret_key = os.getenv('SECRET_KEY') or 'supersecretkey'
 
+# Database configuration
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL') or 'sqlite:///app.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Initialize database
+db.init_app(app)
+
 # CSRF Protection
 csrf = CSRFProtect(app)
 
@@ -44,6 +51,10 @@ def dashboard():
 def logout():
     # Just redirect to auth.logout to keep logic consistent
     return redirect(url_for('auth.logout'))
+
+
+with app.app_context():
+    db.create_all()
 
 
 if __name__ == '__main__':
