@@ -5,6 +5,13 @@ from flask_wtf import CSRFProtect
 from flask_login import LoginManager, login_required, current_user
 from auth import auth
 from models import db, User, Post
+from dotenv import load_dotenv
+
+# Load environment variables from a .env file located in the same directory
+# as this script. This ensures the configuration is found even when the app
+# is started from a different working directory.
+env_path = os.path.join(os.path.dirname(__file__), '.env')
+load_dotenv(env_path)
 
 app = Flask(__name__, template_folder='UI')
 
