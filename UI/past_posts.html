@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Past Posts</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h2>Your Posts</h2>
+        {% if posts %}
+            <ul>
+                {% for post in posts %}
+                <li>
+                    {% if post.image_url %}
+                        <img src="{{ post.image_url }}" alt="post image" style="max-width: 100%;" />
+                    {% endif %}
+                    <p>{{ post.caption }}</p>
+                    <small>{{ post.scheduled_time.strftime('%Y-%m-%d %H:%M') }}</small>
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No posts scheduled yet.</p>
+        {% endif %}
+        <div class="link"><a href="{{ url_for('dashboard') }}">Back to Dashboard</a></div>
+    </div>
+</body>
+</html>
