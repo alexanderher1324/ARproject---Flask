@@ -1,9 +1,9 @@
 import os
-from flask import Flask, render_template, redirect, url_for, session, flash
+from flask import Flask, render_template, redirect, url_for
 from flask_wtf import CSRFProtect
 from flask_login import LoginManager, login_required, current_user
-from auth import auth  # import blueprint
-from models import db, User  # your models and db setup
+from auth import auth
+from models import db, User
 
 app = Flask(__name__, template_folder='UI')
 
@@ -34,10 +34,7 @@ def load_user(user_id):
 
 @app.route('/')
 def index():
-    if current_user.is_authenticated:
-        return redirect(url_for('dashboard'))
-    else:
-        return redirect(url_for('auth.login'))
+    return render_template('index.html')
 
 
 @app.route('/dashboard')
@@ -46,11 +43,7 @@ def dashboard():
     return render_template('dashboard.html', username=current_user.username)
 
 
-@app.route('/logout', methods=['GET'])
-@login_required
-def logout():
-    # Just redirect to auth.logout to keep logic consistent
-    return redirect(url_for('auth.logout'))
+# No need for /logout route here — handled by auth.logout
 
 
 with app.app_context():
