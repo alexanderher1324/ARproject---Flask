@@ -16,7 +16,7 @@
       {% endif %}
     {% endwith %}
     <form method="POST" action="{{ url_for('auth.register') }}">
-        {{ csrf_token() }}
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
         <label for="username">Username:</label>
         <input type="text" name="username" id="username" required autofocus />
         <br /><br />
