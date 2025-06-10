@@ -1,0 +1,25 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Environment variables
+.env
+
+# Database files
+*.sqlite3
+*.db
+
+# Uploads and scheduled posts
+uploads/
+scheduled_posts.json
+
+# VS Code settings
+.vscode/
+
+# macOS system files
+.DS_Store
