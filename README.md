@@ -26,9 +26,9 @@ A Flask-based social media scheduler web app that allows users to:
    ```bash
    pip install Flask Flask-WTF Flask-Login Flask-SQLAlchemy
    ```
-3. (Optional) set environment variables:
-   - `SECRET_KEY` – secret key for Flask sessions.
-   - `DATABASE_URL` – SQLAlchemy connection string. Defaults to SQLite `app.db`.
+3. Set environment variables:
+   - `SECRET_KEY` – **required** secret key for Flask sessions. The app exits if this is not provided.
+   - `DATABASE_URL` – (optional) SQLAlchemy connection string. Defaults to SQLite `app.db`.
 4. Run the development server:
    ```bash
    python BD.py

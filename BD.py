@@ -8,7 +8,10 @@ from models import db, User, Post
 
 app = Flask(__name__, template_folder='UI')
 
-app.secret_key = os.getenv('SECRET_KEY') or 'supersecretkey'
+secret_key = os.getenv('SECRET_KEY')
+if not secret_key:
+    raise RuntimeError("SECRET_KEY environment variable not set")
+app.secret_key = secret_key
 
 # Database configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL') or 'sqlite:///app.db'
