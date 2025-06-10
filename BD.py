@@ -7,14 +7,17 @@ from auth import auth
 from models import db, User, Post
 from dotenv import load_dotenv
 
+env_path = os.path.join(os.path.dirname(__file__), '.env.example')
+load_dotenv(env_path)
+
 load_dotenv()
 
 app = Flask(__name__, template_folder='UI')
 
-secret_key = os.getenv('SECRET_KEY')
-if not secret_key:
+SECRET_KEY = os.getenv('SECRET_KEY')
+if not SECRET_KEY:
     raise RuntimeError("SECRET_KEY environment variable not set")
-app.secret_key = secret_key
+app.config['SECRET_KEY'] = SECRET_KEY
 
 # Database configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL') or 'sqlite:///app.db'
