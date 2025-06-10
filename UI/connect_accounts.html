@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Connect Accounts</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h2>Connect Social Accounts</h2>
+        <form method="POST" action="{{ url_for('connect_accounts') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <label for="instagram_token">Instagram Access Token</label>
+            <input type="text" id="instagram_token" name="instagram_token" value="{{ instagram_token or '' }}" />
+            <label for="instagram_user_id">Instagram User ID</label>
+            <input type="text" id="instagram_user_id" name="instagram_user_id" value="{{ instagram_user_id or '' }}" />
+            <label for="tiktok_token">TikTok Access Token</label>
+            <input type="text" id="tiktok_token" name="tiktok_token" value="{{ tiktok_token or '' }}" />
+            <label for="tiktok_user_id">TikTok User ID</label>
+            <input type="text" id="tiktok_user_id" name="tiktok_user_id" value="{{ tiktok_user_id or '' }}" />
+            <button type="submit">Save</button>
+        </form>
+        <div class="link"><a href="{{ url_for('dashboard') }}">Back to Dashboard</a></div>
+    </div>
+</body>
+</html>

@@ -47,6 +47,25 @@ def dashboard():
     return render_template('dashboard.html', username=current_user.username)
 
 
+@app.route('/connect', methods=['GET', 'POST'])
+@login_required
+def connect_accounts():
+    if request.method == 'POST':
+        current_user.instagram_access_token = request.form.get('instagram_token')
+        current_user.ig_user_id = request.form.get('instagram_user_id')
+        current_user.tiktok_access_token = request.form.get('tiktok_token')
+        current_user.tiktok_user_id = request.form.get('tiktok_user_id')
+        db.session.commit()
+        flash('Accounts connected!')
+        return redirect(url_for('dashboard'))
+
+    return render_template('connect_accounts.html',
+                           instagram_token=current_user.instagram_access_token,
+                           instagram_user_id=current_user.ig_user_id,
+                           tiktok_token=current_user.tiktok_access_token,
+                           tiktok_user_id=current_user.tiktok_user_id)
+
+
 @app.route('/schedule', methods=['GET', 'POST'])
 @login_required
 def schedule_post():
@@ -54,16 +73,25 @@ def schedule_post():
         caption = request.form.get('caption')
         image_url = request.form.get('image_url')
         time_str = request.form.get('scheduled_time')
+        platform = request.form.get('platform')
         try:
             scheduled_time = datetime.strptime(time_str, '%Y-%m-%dT%H:%M')
         except (TypeError, ValueError):
             flash('Invalid date/time format.')
             return redirect(url_for('schedule_post'))
 
+        if platform == 'instagram' and not current_user.instagram_access_token:
+            flash('Please connect your Instagram account first.')
+            return redirect(url_for('connect_accounts'))
+        if platform == 'tiktok' and not current_user.tiktok_access_token:
+            flash('Please connect your TikTok account first.')
+            return redirect(url_for('connect_accounts'))
+
         new_post = Post(user_id=current_user.id,
                         caption=caption,
                         image_url=image_url,
-                        scheduled_time=scheduled_time)
+                        scheduled_time=scheduled_time,
+                        platform=platform)
         db.session.add(new_post)
         db.session.commit()
         flash('Post scheduled successfully!')

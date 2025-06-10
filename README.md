@@ -2,10 +2,10 @@
 
 A Flask-based social media scheduler web app that allows users to:
 
-✅ Register / Login  
-✅ Connect their Instagram account  
-✅ Schedule Instagram posts  
-✅ View past posts  
+✅ Register / Login
+✅ Connect their Instagram or TikTok accounts
+✅ Schedule posts for Instagram or TikTok
+✅ View past posts
 ✅ Secure CSRF-protected login/logout flow  
 ✅ Background scheduler for automated posting  
 
@@ -34,5 +34,7 @@ A Flask-based social media scheduler web app that allows users to:
    python BD.py
    ```
 5. Open your browser at `http://localhost:5000`.
+
+From the dashboard you can connect your social media accounts using the **Connect Accounts** page before scheduling posts.
 
 The dashboard and authentication pages are under the `UI` folder.
