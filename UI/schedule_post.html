@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Schedule Post</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h2>Schedule a Post</h2>
+        <form method="POST" action="{{ url_for('schedule_post') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <label for="image_url">Image URL</label>
+            <input type="text" id="image_url" name="image_url" required />
+            <label for="caption">Caption</label>
+            <input type="text" id="caption" name="caption" required />
+            <label for="scheduled_time">Scheduled Time</label>
+            <input type="datetime-local" id="scheduled_time" name="scheduled_time" required />
+            <button type="submit">Schedule</button>
+        </form>
+        <div class="link"><a href="{{ url_for('dashboard') }}">Back to Dashboard</a></div>
+    </div>
+</body>
+</html>

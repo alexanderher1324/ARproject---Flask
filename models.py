@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
+from datetime import datetime
 
 db = SQLAlchemy()
 
@@ -17,3 +18,14 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         from werkzeug.security import check_password_hash
         return check_password_hash(self.password_hash, password)
+
+
+class Post(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    caption = db.Column(db.String(2200))
+    image_url = db.Column(db.String(500))
+    scheduled_time = db.Column(db.DateTime, default=datetime.utcnow)
+    posted = db.Column(db.Boolean, default=False)
+
+    user = db.relationship('User', backref='posts')
