@@ -128,3 +128,9 @@ nav a:hover {
 .platform-options label {
   font-weight: normal;
 }
+
+.datetime-inputs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}

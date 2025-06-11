@@ -24,8 +24,11 @@
                 <label><input type="checkbox" name="platforms" value="instagram"> Instagram</label>
                 <label><input type="checkbox" name="platforms" value="tiktok"> TikTok</label>
             </div>
-            <label for="scheduled_time">Scheduled Time</label>
-            <input type="datetime-local" id="scheduled_time" name="scheduled_time" required />
+            <label for="scheduled_date">Scheduled Date &amp; Time</label>
+            <div class="datetime-inputs">
+                <input type="date" id="scheduled_date" name="scheduled_date" required />
+                <input type="time" id="scheduled_time" name="scheduled_time" required />
+            </div>
             <button type="submit">Schedule</button>
         </form>
         <div class="link"><a href="{{ url_for('dashboard') }}">Back to Dashboard</a></div>
@@ -64,5 +67,11 @@
         updateFileInfo(fileInput.files);
     });
     fileInput.addEventListener('change', () => updateFileInfo(fileInput.files));
+
+    // Show the calendar immediately on page load if supported
+    const dateInput = document.getElementById('scheduled_date');
+    if (dateInput && dateInput.showPicker) {
+        dateInput.showPicker();
+    }
 </script>
 </html>
