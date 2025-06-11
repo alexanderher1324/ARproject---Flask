@@ -37,6 +37,25 @@
             margin-bottom: 1rem;
         }
 
+        .oauth-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .oauth-btn {
+            padding: 0.5rem 0.75rem;
+            background: #4a90e2;
+            color: white;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .oauth-btn:hover {
+            background: #357ABD;
+        }
+
         form {
             display: flex;
             flex-direction: column;
@@ -101,7 +120,7 @@
 <body>
     <div class="container">
         <h2>Connect Social Accounts</h2>
-        <p>Provide the access tokens for the platforms you want to post to. You can generate these tokens in each platform's developer settings.</p>
+        <p>Connect your accounts using OAuth below, or manually provide access tokens.</p>
 
         <label for="platform_select">Choose a platform for instructions</label>
         <select id="platform_select">
@@ -110,6 +129,11 @@
             <option value="tiktok">TikTok</option>
         </select>
         <p id="token-instructions" class="instructions"></p>
+
+        <div class="oauth-buttons">
+            <a href="{{ url_for('oauth_instagram') }}" class="oauth-btn">Connect Instagram via OAuth</a>
+            <a href="{{ url_for('oauth_tiktok') }}" class="oauth-btn">Connect TikTok via OAuth</a>
+        </div>
 
         {% with messages = get_flashed_messages() %}
           {% if messages %}

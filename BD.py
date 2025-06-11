@@ -4,6 +4,7 @@ from flask import Flask, render_template, redirect, url_for, request, flash
 from werkzeug.utils import secure_filename
 from flask_wtf import CSRFProtect
 from flask_login import LoginManager, login_required, current_user
+from authlib.integrations.flask_client import OAuth
 from auth import auth
 from models import db, User, Post
 from dotenv import load_dotenv
@@ -14,6 +15,25 @@ app = Flask(__name__, template_folder='UI')
 # Removed redundant load_dotenv() call to avoid conflicts
 app.config['UPLOAD_FOLDER'] = os.path.join('static', 'uploads')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+oauth = OAuth(app)
+oauth.register(
+    name='instagram',
+    client_id=os.getenv('INSTAGRAM_CLIENT_ID'),
+    client_secret=os.getenv('INSTAGRAM_CLIENT_SECRET'),
+    access_token_url='https://api.instagram.com/oauth/access_token',
+    authorize_url='https://api.instagram.com/oauth/authorize',
+    client_kwargs={'scope': 'user_profile,user_media'}
+)
+
+oauth.register(
+    name='tiktok',
+    client_id=os.getenv('TIKTOK_CLIENT_KEY'),
+    client_secret=os.getenv('TIKTOK_CLIENT_SECRET'),
+    access_token_url='https://open-api.tiktok.com/oauth/access_token',
+    authorize_url='https://open-api.tiktok.com/platform/oauth/connect/',
+    client_kwargs={'scope': 'user.info.basic,video.list'}
+)
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 if not SECRET_KEY:
@@ -75,6 +95,41 @@ def connect_accounts():
                            instagram_user_id=current_user.ig_user_id,
                            tiktok_token=current_user.tiktok_access_token,
                            tiktok_user_id=current_user.tiktok_user_id)
+
+@app.route('/oauth/instagram')
+@login_required
+def oauth_instagram():
+    redirect_uri = url_for('instagram_callback', _external=True)
+    return oauth.instagram.authorize_redirect(redirect_uri)
+
+
+@app.route('/oauth/instagram/callback')
+@login_required
+def instagram_callback():
+    token = oauth.instagram.authorize_access_token()
+    current_user.instagram_access_token = token.get('access_token')
+    current_user.ig_user_id = token.get('user_id')
+    db.session.commit()
+    flash('Instagram connected!')
+    return redirect(url_for('dashboard'))
+
+
+@app.route('/oauth/tiktok')
+@login_required
+def oauth_tiktok():
+    redirect_uri = url_for('tiktok_callback', _external=True)
+    return oauth.tiktok.authorize_redirect(redirect_uri)
+
+
+@app.route('/oauth/tiktok/callback')
+@login_required
+def tiktok_callback():
+    token = oauth.tiktok.authorize_access_token()
+    current_user.tiktok_access_token = token.get('access_token')
+    current_user.tiktok_user_id = token.get('open_id')
+    db.session.commit()
+    flash('TikTok connected!')
+    return redirect(url_for('dashboard'))
 
 
 @app.route('/schedule', methods=['GET', 'POST'])
