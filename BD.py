@@ -8,13 +8,10 @@ from auth import auth
 from models import db, User, Post
 from dotenv import load_dotenv
 
-env_path = os.path.join(os.path.dirname(__file__), '.env.example')
-load_dotenv(env_path)
-
 load_dotenv()
 
 app = Flask(__name__, template_folder='UI')
-
+# Removed redundant load_dotenv() call to avoid conflicts
 app.config['UPLOAD_FOLDER'] = os.path.join('static', 'uploads')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
@@ -93,7 +90,7 @@ def schedule_post():
         if uploaded_file and uploaded_file.filename:
             extension = uploaded_file.filename.rsplit('.', 1)[-1].lower()
             if extension in ALLOWED_EXTENSIONS:
-                filename = secure_filename(uploaded_file.filename)
+                filename = f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{secure_filename(uploaded_file.filename)}"
                 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
                 file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 uploaded_file.save(file_path)
