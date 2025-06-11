@@ -120,7 +120,7 @@
         {% endwith %}
 
         <form method="POST" action="{{ url_for('connect_accounts') }}">
-            {{ csrf_token() }}
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
             <label for="instagram_token">Instagram Access Token</label>
             <input type="text" id="instagram_token" name="instagram_token" value="{{ instagram_token or '' }}" placeholder="Paste your Instagram token" />
