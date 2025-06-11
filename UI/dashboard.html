@@ -9,6 +9,18 @@
     <div class="container">
         <h1>Welcome, {{ username }}!</h1>
 
+        {% if instagram_connected %}
+            <p>Instagram account connected.</p>
+        {% else %}
+            <p>Instagram not connected. <a href="{{ url_for('connect_accounts') }}">Connect now</a></p>
+        {% endif %}
+
+        {% if tiktok_connected %}
+            <p>TikTok account connected.</p>
+        {% else %}
+            <p>TikTok not connected. <a href="{{ url_for('connect_accounts') }}">Connect now</a></p>
+        {% endif %}
+
         <nav>
             <ul>
                 <li><a href="{{ url_for('schedule_post') }}">Schedule Post</a></li>
