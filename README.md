@@ -30,7 +30,7 @@ A Flask-based social media scheduler web app that allows users to:
    ```bash
    cp .env.example .env
    ```
-   Set environment variables inside `.env`:
+   Set environment variables inside `.env` (the application loads this file automatically and will fall back to `.env.example` if needed):
    - `SECRET_KEY` – **required** secret key for Flask sessions. The app exits if this is not provided.
    - `DATABASE_URL` – (optional) SQLAlchemy connection string. Defaults to SQLite `app.db`.
 4. Run the development server:
