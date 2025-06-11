@@ -1,10 +1,11 @@
 import os
 from datetime import datetime
-from flask import Flask, render_template, redirect, url_for, request, flash
+from flask import Flask, render_template, redirect, url_for, request, flash, jsonify
 from werkzeug.utils import secure_filename
 from flask_wtf import CSRFProtect
 from flask_login import LoginManager, login_required, current_user
 from authlib.integrations.flask_client import OAuth
+import requests
 from auth import auth
 from models import db, User, Post
 from pathlib import Path
@@ -135,6 +136,49 @@ def tiktok_callback():
     db.session.commit()
     flash('TikTok connected!')
     return redirect(url_for('dashboard'))
+
+
+@app.route('/suggest_captions', methods=['POST'])
+@login_required
+def suggest_captions():
+    data = request.get_json() or {}
+    image = data.get('image')
+    if not image:
+        return jsonify({'error': 'No image provided'}), 400
+
+    api_key = os.getenv('OPENAI_API_KEY')
+    if not api_key:
+        return jsonify({'error': 'OPENAI_API_KEY not configured'}), 500
+
+    try:
+        headers = {
+            'Authorization': f'Bearer {api_key}'
+        }
+        payload = {
+            'model': 'gpt-4-vision-preview',
+            'messages': [
+                {
+                    'role': 'user',
+                    'content': [
+                        {
+                            'type': 'text',
+                            'text': 'Suggest three short captions and trending hashtags for this image.'
+                        },
+                        {
+                            'type': 'image_url',
+                            'image_url': {'url': image}
+                        }
+                    ]
+                }
+            ],
+            'max_tokens': 200
+        }
+        resp = requests.post('https://api.openai.com/v1/chat/completions', headers=headers, json=payload, timeout=20)
+        resp.raise_for_status()
+        suggestions = resp.json()['choices'][0]['message']['content']
+        return jsonify({'suggestions': suggestions})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 @app.route('/schedule', methods=['GET', 'POST'])
