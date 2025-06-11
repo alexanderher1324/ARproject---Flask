@@ -24,6 +24,8 @@
             <div id="file-info"></div>
             <label for="caption">Caption</label>
             <input type="text" id="caption" name="caption" required />
+            <button type="button" id="suggest_btn">Suggest Captions</button>
+            <pre id="suggestions"></pre>
             <label>Platforms</label>
             <div class="platform-options">
                 <label><input type="checkbox" name="platforms" value="instagram"> Instagram</label>
@@ -46,6 +48,8 @@
     const fileInfo = document.getElementById('file-info');
     const sourceRadios = document.getElementsByName('image_source');
     const imageUrlInput = document.getElementById('image_url');
+    const suggestBtn = document.getElementById('suggest_btn');
+    const suggestionsEl = document.getElementById('suggestions');
 
     sourceRadios.forEach(radio => {
         radio.addEventListener('change', () => {
@@ -87,6 +91,38 @@
         updateFileInfo(fileInput.files);
     });
     fileInput.addEventListener('change', () => updateFileInfo(fileInput.files));
+
+    suggestBtn.addEventListener('click', async () => {
+        let imgSrc = null;
+        if (document.querySelector('input[name="image_source"]:checked').value === 'url') {
+            imgSrc = imageUrlInput.value;
+        } else {
+            const file = fileInput.files[0];
+            if (file) {
+                imgSrc = await new Promise(resolve => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.readAsDataURL(file);
+                });
+            }
+        }
+        if (!imgSrc) {
+            alert('Please provide an image URL or file first.');
+            return;
+        }
+        suggestionsEl.textContent = 'Generating...';
+        try {
+            const response = await fetch('/suggest_captions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image: imgSrc })
+            });
+            const data = await response.json();
+            suggestionsEl.textContent = data.suggestions || data.error || 'Error';
+        } catch (err) {
+            suggestionsEl.textContent = 'Error';
+        }
+    });
 
     flatpickr("#scheduled_date", {
         dateFormat: "Y-m-d"
