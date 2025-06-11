@@ -10,6 +10,8 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(256), nullable=False)
     instagram_access_token = db.Column(db.String(500))
     ig_user_id = db.Column(db.String(100))
+    tiktok_access_token = db.Column(db.String(500))
+    tiktok_user_id = db.Column(db.String(100))
 
     def set_password(self, password):
         from werkzeug.security import generate_password_hash
@@ -27,5 +29,6 @@ class Post(db.Model):
     image_url = db.Column(db.String(500))
     scheduled_time = db.Column(db.DateTime, default=datetime.utcnow)
     posted = db.Column(db.Boolean, default=False)
+    platform = db.Column(db.String(50), default='instagram', nullable=False)
 
     user = db.relationship('User', backref='posts')
