@@ -111,7 +111,7 @@ def instagram_callback():
     current_user.ig_user_id = token.get('user_id')
     db.session.commit()
     flash('Instagram connected!')
-    return redirect(url_for('dashboard'))
+    return redirect(url_for('connect_accounts'))
 
 
 @app.route('/oauth/tiktok')
