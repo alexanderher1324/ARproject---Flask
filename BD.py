@@ -8,7 +8,7 @@ from auth import auth
 from models import db, User, Post
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(".env.example")  # Load environment variables from .env file
 
 app = Flask(__name__, template_folder='UI')
 # Removed redundant load_dotenv() call to avoid conflicts
