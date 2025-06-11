@@ -39,4 +39,20 @@ A Flask-based social media scheduler web app that allows users to:
    ```
 5. Open your browser at `http://localhost:5000`.
 
+### Updating the database schema
+
+If you add fields to models in `models.py` after the initial `app.db` has been
+created, the existing SQLite database will not automatically pick up the new
+columns. In that case delete `app.db` and let the application recreate it at
+startup:
+
+```bash
+rm app.db
+python BD.py  # creates a fresh database with the new columns
+```
+
+For production setups you would normally use a migration tool such as
+[Flask-Migrate](https://flask-migrate.readthedocs.io/) instead of deleting the
+database.
+
 The dashboard and authentication pages are under the `UI` folder.
