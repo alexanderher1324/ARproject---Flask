@@ -84,10 +84,11 @@ def schedule_post():
         caption = request.form.get('caption')
         image_url = request.form.get('image_url')
         uploaded_file = request.files.get('image_file')
+        date_str = request.form.get('scheduled_date')
         time_str = request.form.get('scheduled_time')
         platforms = request.form.getlist('platforms')
         try:
-            scheduled_time = datetime.strptime(time_str, '%Y-%m-%dT%H:%M')
+            scheduled_time = datetime.strptime(f"{date_str} {time_str}", '%Y-%m-%d %H:%M')
         except (TypeError, ValueError):
             flash('Invalid date/time format.')
             return redirect(url_for('schedule_post'))
