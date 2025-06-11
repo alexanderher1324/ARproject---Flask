@@ -17,8 +17,17 @@
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
             <label for="username">Username:</label>
             <input type="text" name="username" id="username" required autofocus />
+
+            <label for="email">Email:</label>
+            <input type="email" name="email" id="email" required />
+            <label for="confirm_email">Confirm Email:</label>
+            <input type="email" name="confirm_email" id="confirm_email" required />
+
             <label for="password">Password:</label>
             <input type="password" name="password" id="password" required />
+            <label for="confirm_password">Confirm Password:</label>
+            <input type="password" name="confirm_password" id="confirm_password" required />
+
             <button type="submit">Register</button>
         </form>
         <div class="link">Already have an account? <a href="{{ url_for('auth.login') }}">Login here</a></div>

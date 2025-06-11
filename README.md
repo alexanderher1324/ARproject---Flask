@@ -2,7 +2,7 @@
 
 A Flask-based social media scheduler web app that allows users to:
 
-✅ Register / Login
+✅ Register / Login with email and password confirmation
 ✅ Connect Instagram or TikTok accounts
 ✅ Schedule posts for either platform
 ✅ View past posts
