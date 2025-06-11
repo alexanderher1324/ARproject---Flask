@@ -51,7 +51,12 @@ def index():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    return render_template('dashboard.html', username=current_user.username)
+    instagram_connected = bool(current_user.instagram_access_token)
+    tiktok_connected = bool(current_user.tiktok_access_token)
+    return render_template('dashboard.html',
+                           username=current_user.username,
+                           instagram_connected=instagram_connected,
+                           tiktok_connected=tiktok_connected)
 
 @app.route('/connect', methods=['GET', 'POST'])
 @login_required
