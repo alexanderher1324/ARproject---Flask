@@ -34,7 +34,10 @@ label {
   color: #555;
 }
 input[type="text"],
-input[type="password"] {
+input[type="password"],
+input[type="date"],
+input[type="time"],
+.flatpickr-input {
   padding: 0.75rem 1rem;
   margin-bottom: 1.25rem;
   border: 1.5px solid #ddd;
@@ -43,7 +46,10 @@ input[type="password"] {
   transition: border-color 0.3s ease;
 }
 input[type="text"]:focus,
-input[type="password"]:focus {
+input[type="password"]:focus,
+input[type="date"]:focus,
+input[type="time"]:focus,
+.flatpickr-input:focus {
   border-color: #4a90e2;
   outline: none;
 }
