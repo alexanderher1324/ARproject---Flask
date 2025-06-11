@@ -8,10 +8,14 @@
 <body>
     <div class="container">
         <h2>Schedule a Post</h2>
-        <form method="POST" action="{{ url_for('schedule_post') }}">
+        <form method="POST" action="{{ url_for('schedule_post') }}" enctype="multipart/form-data">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
             <label for="image_url">Image URL</label>
-            <input type="text" id="image_url" name="image_url" required />
+            <input type="text" id="image_url" name="image_url" />
+            <div id="drop-area">
+                <p>Drag & Drop Image Here or Click to Upload</p>
+                <input type="file" id="image_file" name="image_file" accept="image/*" style="display:none" />
+            </div>
             <label for="caption">Caption</label>
             <input type="text" id="caption" name="caption" required />
             <label for="platform">Platform</label>
@@ -26,4 +30,27 @@
         <div class="link"><a href="{{ url_for('dashboard') }}">Back to Dashboard</a></div>
     </div>
 </body>
+<script>
+    const dropArea = document.getElementById('drop-area');
+    const fileInput = document.getElementById('image_file');
+
+    dropArea.addEventListener('click', () => fileInput.click());
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropArea.addEventListener(eventName, e => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropArea.classList.add('highlight');
+        });
+    });
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, e => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropArea.classList.remove('highlight');
+        });
+    });
+    dropArea.addEventListener('drop', e => {
+        fileInput.files = e.dataTransfer.files;
+    });
+</script>
 </html>
