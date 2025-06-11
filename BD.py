@@ -7,9 +7,14 @@ from flask_login import LoginManager, login_required, current_user
 from authlib.integrations.flask_client import OAuth
 from auth import auth
 from models import db, User, Post
+from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv(".env.example")  
+# Load variables from `.env` if present. If not, fall back to `.env.example` so
+# the sample app still runs with default values.
+load_dotenv()
+if not os.getenv("SECRET_KEY") and Path(".env.example").exists():
+    load_dotenv(".env.example")
 
 app = Flask(__name__, template_folder='UI')
 # Removed redundant load_dotenv() call to avoid conflicts
