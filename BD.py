@@ -85,7 +85,7 @@ def schedule_post():
         image_url = request.form.get('image_url')
         uploaded_file = request.files.get('image_file')
         time_str = request.form.get('scheduled_time')
-        platform = request.form.get('platform')
+        platforms = request.form.getlist('platforms')
         try:
             scheduled_time = datetime.strptime(time_str, '%Y-%m-%dT%H:%M')
         except (TypeError, ValueError):
@@ -104,19 +104,25 @@ def schedule_post():
                 flash('Unsupported file type.')
                 return redirect(url_for('schedule_post'))
 
-        if platform == 'instagram' and not current_user.instagram_access_token:
-            flash('Please connect your Instagram account first.')
-            return redirect(url_for('connect_accounts'))
-        if platform == 'tiktok' and not current_user.tiktok_access_token:
-            flash('Please connect your TikTok account first.')
-            return redirect(url_for('connect_accounts'))
+        if not platforms:
+            flash('Please select at least one platform.')
+            return redirect(url_for('schedule_post'))
 
-        new_post = Post(user_id=current_user.id,
-                        caption=caption,
-                        image_url=image_url,
-                        scheduled_time=scheduled_time,
-                        platform=platform)
-        db.session.add(new_post)
+        for platform in platforms:
+            if platform == 'instagram' and not current_user.instagram_access_token:
+                flash('Please connect your Instagram account first.')
+                return redirect(url_for('connect_accounts'))
+            if platform == 'tiktok' and not current_user.tiktok_access_token:
+                flash('Please connect your TikTok account first.')
+                return redirect(url_for('connect_accounts'))
+
+            new_post = Post(user_id=current_user.id,
+                            caption=caption,
+                            image_url=image_url,
+                            scheduled_time=scheduled_time,
+                            platform=platform)
+            db.session.add(new_post)
+
         db.session.commit()
         flash('Post scheduled successfully!')
         return redirect(url_for('dashboard'))
