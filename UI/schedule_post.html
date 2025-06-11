@@ -11,9 +11,13 @@
         <h2>Schedule a Post</h2>
         <form method="POST" action="{{ url_for('schedule_post') }}" enctype="multipart/form-data">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-            <label for="image_url">Image URL</label>
-            <input type="text" id="image_url" name="image_url" />
-            <div id="drop-area">
+            <label>Image Source</label>
+            <div class="source-options">
+                <label><input type="radio" name="image_source" value="url" checked> URL</label>
+                <label><input type="radio" name="image_source" value="file"> Upload</label>
+            </div>
+            <input type="text" id="image_url" name="image_url" placeholder="Paste image URL" />
+            <div id="drop-area" style="display:none">
                 <p>Drag & Drop Image Here or Click to Upload</p>
                 <input type="file" id="image_file" name="image_file" accept="image/*" style="display:none" />
             </div>
@@ -40,6 +44,20 @@
         const dropArea = document.getElementById('drop-area');
     const fileInput = document.getElementById('image_file');
     const fileInfo = document.getElementById('file-info');
+    const sourceRadios = document.getElementsByName('image_source');
+    const imageUrlInput = document.getElementById('image_url');
+
+    sourceRadios.forEach(radio => {
+        radio.addEventListener('change', () => {
+            if (radio.value === 'url' && radio.checked) {
+                imageUrlInput.style.display = 'block';
+                dropArea.style.display = 'none';
+            } else if (radio.value === 'file' && radio.checked) {
+                imageUrlInput.style.display = 'none';
+                dropArea.style.display = 'block';
+            }
+        });
+    });
 
     function updateFileInfo(files) {
         if (files && files.length > 0) {
