@@ -112,9 +112,13 @@
         }
         suggestionsEl.textContent = 'Generating...';
         try {
+            const csrfToken = document.querySelector('input[name="csrf_token"]').value;
             const response = await fetch('/suggest_captions', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
                 body: JSON.stringify({ image: imgSrc })
             });
             const data = await response.json();
