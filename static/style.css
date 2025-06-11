@@ -112,3 +112,19 @@ nav a:hover {
 #drop-area.highlight {
   border-color: #4a90e2;
 }
+
+#file-info {
+  text-align: center;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.platform-options {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.platform-options label {
+  font-weight: normal;
+}
