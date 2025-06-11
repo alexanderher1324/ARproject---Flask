@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 from flask import Flask, render_template, redirect, url_for, request, flash
+from werkzeug.utils import secure_filename
 from flask_wtf import CSRFProtect
 from flask_login import LoginManager, login_required, current_user
 from auth import auth
@@ -13,6 +14,9 @@ load_dotenv(env_path)
 load_dotenv()
 
 app = Flask(__name__, template_folder='UI')
+
+app.config['UPLOAD_FOLDER'] = os.path.join('static', 'uploads')
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 if not SECRET_KEY:
@@ -77,6 +81,7 @@ def schedule_post():
     if request.method == 'POST':
         caption = request.form.get('caption')
         image_url = request.form.get('image_url')
+        uploaded_file = request.files.get('image_file')
         time_str = request.form.get('scheduled_time')
         platform = request.form.get('platform')
         try:
@@ -85,6 +90,18 @@ def schedule_post():
             flash('Invalid date/time format.')
             return redirect(url_for('schedule_post'))
         
+        if uploaded_file and uploaded_file.filename:
+            extension = uploaded_file.filename.rsplit('.', 1)[-1].lower()
+            if extension in ALLOWED_EXTENSIONS:
+                filename = secure_filename(uploaded_file.filename)
+                os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+                file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                uploaded_file.save(file_path)
+                image_url = url_for('static', filename=f'uploads/{filename}')
+            else:
+                flash('Unsupported file type.')
+                return redirect(url_for('schedule_post'))
+
         if platform == 'instagram' and not current_user.instagram_access_token:
             flash('Please connect your Instagram account first.')
             return redirect(url_for('connect_accounts'))

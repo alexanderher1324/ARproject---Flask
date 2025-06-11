@@ -16,6 +16,7 @@ instance/
 
 # Uploads and scheduled posts
 uploads/
+!static/uploads/
 scheduled_posts.json
 
 # VS Code settings
