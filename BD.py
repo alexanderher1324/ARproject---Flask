@@ -5,7 +5,7 @@ from werkzeug.utils import secure_filename
 from flask_wtf import CSRFProtect
 from flask_login import LoginManager, login_required, current_user
 from authlib.integrations.flask_client import OAuth
-import requests
+import openai
 from auth import auth
 from models import db, User, Post
 from pathlib import Path
@@ -151,12 +151,10 @@ def suggest_captions():
         return jsonify({'error': 'OPENAI_API_KEY not configured'}), 500
 
     try:
-        headers = {
-            'Authorization': f'Bearer {api_key}'
-        }
-        payload = {
-            'model': 'gpt-4-vision-preview',
-            'messages': [
+        client = openai.OpenAI(api_key=api_key)
+        response = client.chat.completions.create(
+            model='gpt-4-vision-preview',
+            messages=[
                 {
                     'role': 'user',
                     'content': [
@@ -171,11 +169,9 @@ def suggest_captions():
                     ]
                 }
             ],
-            'max_tokens': 200
-        }
-        resp = requests.post('https://api.openai.com/v1/chat/completions', headers=headers, json=payload, timeout=20)
-        resp.raise_for_status()
-        suggestions = resp.json()['choices'][0]['message']['content']
+            max_tokens=200
+        )
+        suggestions = response.choices[0].message.content
         return jsonify({'suggestions': suggestions})
     except Exception as e:
         return jsonify({'error': str(e)}), 500

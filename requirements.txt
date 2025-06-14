@@ -4,4 +4,4 @@ Flask-Login
 Flask-SQLAlchemy
 python-dotenv
 Authlib
-requests
+openai
