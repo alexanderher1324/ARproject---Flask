@@ -1,7 +1,8 @@
 import os
 import json
 from unittest.mock import patch, Mock
-import requests
+import httpx
+import openai
 import pytest
 
 # Set required environment variables before importing the app
@@ -21,28 +22,35 @@ def client():
 
 def test_suggest_captions_success(client):
     mock_resp = Mock()
-    mock_resp.raise_for_status = Mock()
-    mock_resp.json.return_value = {
-        'choices': [{
-            'message': {'content': 'caption suggestions'}
-        }]
-    }
-    with patch('BD.requests.post', return_value=mock_resp) as mock_post:
+    mock_resp.choices = [Mock(message=Mock(content='caption suggestions'))]
+    with patch('BD.openai.OpenAI') as mock_openai:
+        mock_client = Mock()
+        mock_client.chat.completions.create.return_value = mock_resp
+        mock_openai.return_value = mock_client
         resp = client.post('/suggest_captions', json={'image': 'http://img.jpg'})
     assert resp.status_code == 200
     assert resp.get_json() == {'suggestions': 'caption suggestions'}
-    mock_post.assert_called_once()
+    mock_client.chat.completions.create.assert_called_once()
 
 def test_suggest_captions_api_error(client):
-    mock_resp = Mock()
-    mock_resp.raise_for_status.side_effect = requests.exceptions.HTTPError('bad request')
-    with patch('BD.requests.post', return_value=mock_resp):
+    with patch('BD.openai.OpenAI') as mock_openai:
+        mock_client = Mock()
+        mock_client.chat.completions.create.side_effect = openai.APIError(
+            'bad request', request=httpx.Request('POST', 'http://x'), body=None)
+        mock_openai.return_value = mock_client
         resp = client.post('/suggest_captions', json={'image': 'http://img.jpg'})
     assert resp.status_code == 500
     assert 'bad request' in resp.get_json()['error']
+    mock_client.chat.completions.create.assert_called_once()
 
 def test_suggest_captions_timeout(client):
-    with patch('BD.requests.post', side_effect=requests.exceptions.Timeout('timeout')):
+    with patch('BD.openai.OpenAI') as mock_openai:
+        mock_client = Mock()
+        mock_client.chat.completions.create.side_effect = openai.APITimeoutError(
+            request=httpx.Request('POST', 'http://x')
+        )
+        mock_openai.return_value = mock_client
         resp = client.post('/suggest_captions', json={'image': 'http://img.jpg'})
     assert resp.status_code == 500
-    assert 'timeout' in resp.get_json()['error']
+    assert 'Network error' in resp.get_json()['error']
+    assert mock_client.chat.completions.create.call_count == 3
