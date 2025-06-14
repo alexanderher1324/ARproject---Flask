@@ -6,6 +6,8 @@ from flask_wtf import CSRFProtect
 from flask_login import LoginManager, login_required, current_user
 from authlib.integrations.flask_client import OAuth
 import requests
+import time
+from requests.exceptions import RequestException, HTTPError
 from auth import auth
 from models import db, User, Post
 from pathlib import Path
@@ -67,6 +69,26 @@ login_manager.init_app(app)
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+
+def _post_openai_with_retry(headers, payload, retries: int = 3):
+    """Post to the OpenAI API with basic retry logic."""
+    url = 'https://api.openai.com/v1/chat/completions'
+    for attempt in range(1, retries + 1):
+        try:
+            resp = requests.post(url, headers=headers, json=payload, timeout=20)
+            if resp.status_code == 429:
+                if attempt == retries:
+                    resp.raise_for_status()
+                time.sleep(2 ** attempt)
+                continue
+            resp.raise_for_status()
+            return resp.json()
+        except RequestException as e:
+            if attempt == retries:
+                raise e
+            time.sleep(2 ** attempt)
+
 
 
 @app.route('/')
@@ -150,33 +172,42 @@ def suggest_captions():
     if not api_key:
         return jsonify({'error': 'OPENAI_API_KEY not configured'}), 500
 
+    headers = {
+        'Authorization': f'Bearer {api_key}'
+    }
+    payload = {
+        'model': 'gpt-4-vision-preview',
+        'messages': [
+            {
+                'role': 'user',
+                'content': [
+                    {
+                        'type': 'text',
+                        'text': 'Suggest three short captions and trending hashtags for this image.'
+                    },
+                    {
+                        'type': 'image_url',
+                        'image_url': {'url': image}
+                    }
+                ]
+            }
+        ],
+        'max_tokens': 200
+    }
+
     try:
-        headers = {
-            'Authorization': f'Bearer {api_key}'
-        }
-        payload = {
-            'model': 'gpt-4-vision-preview',
-            'messages': [
-                {
-                    'role': 'user',
-                    'content': [
-                        {
-                            'type': 'text',
-                            'text': 'Suggest three short captions and trending hashtags for this image.'
-                        },
-                        {
-                            'type': 'image_url',
-                            'image_url': {'url': image}
-                        }
-                    ]
-                }
-            ],
-            'max_tokens': 200
-        }
-        resp = requests.post('https://api.openai.com/v1/chat/completions', headers=headers, json=payload, timeout=20)
-        resp.raise_for_status()
-        suggestions = resp.json()['choices'][0]['message']['content']
+        resp_json = _post_openai_with_retry(headers, payload)
+        suggestions = resp_json['choices'][0]['message']['content']
         return jsonify({'suggestions': suggestions})
+    except HTTPError as e:
+        status = e.response.status_code if e.response else 500
+        if status == 429:
+            message = 'OpenAI API rate limit exceeded. Please try again later.'
+        else:
+            message = f'OpenAI API error: {e.response.text if e.response else e}'
+        return jsonify({'error': message}), status
+    except RequestException as e:
+        return jsonify({'error': f'Network error contacting OpenAI: {e}'}), 502
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
