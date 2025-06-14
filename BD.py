@@ -6,6 +6,8 @@ from flask_wtf import CSRFProtect
 from flask_login import LoginManager, login_required, current_user
 from authlib.integrations.flask_client import OAuth
 import openai
+from openai import RateLimitError, APIError, APIConnectionError, APITimeoutError
+import time
 from auth import auth
 from models import db, User, Post
 from pathlib import Path
@@ -150,31 +152,45 @@ def suggest_captions():
     if not api_key:
         return jsonify({'error': 'OPENAI_API_KEY not configured'}), 500
 
-    try:
-        client = openai.OpenAI(api_key=api_key)
-        response = client.chat.completions.create(
-            model='gpt-4-vision-preview',
-            messages=[
-                {
-                    'role': 'user',
-                    'content': [
-                        {
-                            'type': 'text',
-                            'text': 'Suggest three short captions and trending hashtags for this image.'
-                        },
-                        {
-                            'type': 'image_url',
-                            'image_url': {'url': image}
-                        }
-                    ]
-                }
-            ],
-            max_tokens=200
-        )
-        suggestions = response.choices[0].message.content
-        return jsonify({'suggestions': suggestions})
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    client = openai.OpenAI(api_key=api_key, max_retries=0)
+    attempts = 3
+    for attempt in range(attempts):
+        try:
+            response = client.chat.completions.create(
+                model='gpt-4-vision-preview',
+                messages=[
+                    {
+                        'role': 'user',
+                        'content': [
+                            {
+                                'type': 'text',
+                                'text': 'Suggest three short captions and trending hashtags for this image.'
+                            },
+                            {
+                                'type': 'image_url',
+                                'image_url': {'url': image}
+                            }
+                        ]
+                    }
+                ],
+                max_tokens=200
+            )
+            suggestions = response.choices[0].message.content
+            return jsonify({'suggestions': suggestions})
+        except (APIConnectionError, APITimeoutError) as e:
+            if attempt < attempts - 1:
+                time.sleep(2 ** attempt)
+                continue
+            return jsonify({'error': f'Network error: {e}'}), 500
+        except RateLimitError:
+            if attempt < attempts - 1:
+                time.sleep(2 ** attempt)
+                continue
+            return jsonify({'error': 'Rate limit exceeded. Please try again later.'}), 429
+        except APIError as e:
+            return jsonify({'error': f'OpenAI API error: {e}'}), 500
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
 
 
 @app.route('/schedule', methods=['GET', 'POST'])
