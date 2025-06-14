@@ -254,9 +254,6 @@ def view_past_posts():
     return render_template('past_posts.html', posts=posts)
 
 
-# No need for /logout route here — handled by auth.logout
-
-
 with app.app_context():
     db.create_all()
 
