@@ -120,15 +120,7 @@
 <body>
     <div class="container">
         <h2>Connect Social Accounts</h2>
-        <p>Connect your accounts using OAuth below, or manually provide access tokens.</p>
-
-        <label for="platform_select">Choose a platform for instructions</label>
-        <select id="platform_select">
-            <option value="">-- Select a platform --</option>
-            <option value="instagram">Instagram</option>
-            <option value="tiktok">TikTok</option>
-        </select>
-        <p id="token-instructions" class="instructions"></p>
+        <p class="instructions">Use the buttons below to authorize Instagram and TikTok.</p>
 
         <div class="oauth-buttons">
             <a href="{{ url_for('oauth_instagram') }}" class="oauth-btn">Connect Instagram via OAuth</a>
@@ -143,38 +135,8 @@
           {% endif %}
         {% endwith %}
 
-        <form method="POST" action="{{ url_for('connect_accounts') }}">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-
-            <label for="instagram_token">Instagram Access Token</label>
-            <input type="text" id="instagram_token" name="instagram_token" value="{{ instagram_token or '' }}" placeholder="Paste your Instagram token" />
-
-            <label for="instagram_user_id">Instagram User ID</label>
-            <input type="text" id="instagram_user_id" name="instagram_user_id" value="{{ instagram_user_id or '' }}" placeholder="Your Instagram user ID" />
-
-            <label for="tiktok_token">TikTok Access Token</label>
-            <input type="text" id="tiktok_token" name="tiktok_token" value="{{ tiktok_token or '' }}" placeholder="Paste your TikTok token" />
-
-            <label for="tiktok_user_id">TikTok User ID</label>
-            <input type="text" id="tiktok_user_id" name="tiktok_user_id" value="{{ tiktok_user_id or '' }}" placeholder="Your TikTok user ID" />
-
-            <button type="submit">Save</button>
-        </form>
-
         <div class="link"><a href="{{ url_for('dashboard') }}">Back to Dashboard</a></div>
     </div>
-<script>
-    const select = document.getElementById('platform_select');
-    const instructions = document.getElementById('token-instructions');
-    select.addEventListener('change', () => {
-        if (select.value === 'instagram') {
-            instructions.textContent = 'Generate an Instagram access token from the Facebook Developer portal under Instagram Basic Display.';
-        } else if (select.value === 'tiktok') {
-            instructions.textContent = 'Get a TikTok access token on developers.tiktok.com by creating an app and visiting the Authentication section.';
-        } else {
-            instructions.textContent = '';
-        }
-    });
-</script>
+<script></script>
 </body>
 </html>
