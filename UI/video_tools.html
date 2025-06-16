@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Video Tools</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container">
+    <h2>Upload a Video</h2>
+    <form method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <input type="file" name="video_file" accept="video/*" required />
+        <button type="submit">Upload</button>
+    </form>
+    {% if thumbnail_url %}
+    <h3>Thumbnail</h3>
+    <img src="{{ thumbnail_url }}" alt="Thumbnail" style="max-width: 100%;" />
+    {% endif %}
+    {% if short_video_url %}
+    <h3>20-second Clip</h3>
+    <video src="{{ short_video_url }}" controls style="max-width: 100%;"></video>
+    {% endif %}
+    <div class="link"><a href="{{ url_for('dashboard') }}">Back to Dashboard</a></div>
+</div>
+</body>
+</html>
