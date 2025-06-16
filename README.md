@@ -59,28 +59,9 @@ database.
 
 The dashboard and authentication pages are under the `UI` folder.
 
-## Connecting social accounts without OAuth
+## Connecting social accounts
 
-If OAuth authentication fails or cannot be used, the app still allows you to
-link Instagram and TikTok accounts by manually entering access tokens. Navigate
-to **Connect Social Accounts** from the dashboard. The form lets you paste the
-access token and user ID for each platform:
-
-```
-<form method="POST" action="{{ url_for('connect_accounts') }}">
-    <label for="instagram_token">Instagram Access Token</label>
-    <input type="text" id="instagram_token" name="instagram_token" placeholder="Paste your Instagram token" />
-
-    <label for="instagram_user_id">Instagram User ID</label>
-    <input type="text" id="instagram_user_id" name="instagram_user_id" placeholder="Your Instagram user ID" />
-
-    <label for="tiktok_token">TikTok Access Token</label>
-    <input type="text" id="tiktok_token" name="tiktok_token" placeholder="Paste your TikTok token" />
-
-    <label for="tiktok_user_id">TikTok User ID</label>
-    <input type="text" id="tiktok_user_id" name="tiktok_user_id" placeholder="Your TikTok user ID" />
-```
-
-Select a platform from the drop-down to see tips on generating tokens from the
-respective developer portals. After saving, the tokens are stored in the
-database and your accounts will be treated as connected.
+Open the **Connect Social Accounts** page from the dashboard and use the
+provided buttons to authorize Instagram or TikTok via OAuth. After you approve
+access, the obtained tokens are stored automatically and the dashboard will show
+the platforms as connected.
