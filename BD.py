@@ -22,7 +22,12 @@ if not os.getenv("SECRET_KEY") and Path(".env.example").exists():
 app = Flask(__name__, template_folder='UI')
 # Removed redundant load_dotenv() call to avoid conflicts
 app.config['UPLOAD_FOLDER'] = os.path.join('static', 'uploads')
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+# Allow common image and video extensions so users can upload
+# pictures or short clips for scheduled posts.
+ALLOWED_EXTENSIONS = {
+    'png', 'jpg', 'jpeg', 'gif',
+    'mp4', 'mov', 'avi', 'webm'
+}
 
 oauth = OAuth(app)
 oauth.register(

@@ -138,6 +138,16 @@ nav a:hover {
   color: #ccc;
 }
 
+#preview {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+#preview img,
+#preview video {
+  max-width: 100%;
+  border-radius: 8px;
+}
+
 .platform-options {
   display: flex;
   gap: 1rem;

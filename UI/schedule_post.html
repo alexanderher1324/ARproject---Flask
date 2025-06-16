@@ -18,10 +18,11 @@
             </div>
             <input type="text" id="image_url" name="image_url" placeholder="Paste image URL" />
             <div id="drop-area" style="display:none">
-                <p>Drag & Drop Image Here or Click to Upload</p>
-                <input type="file" id="image_file" name="image_file" accept="image/*" style="display:none" />
+                <p>Drag & Drop Media Here or Click to Upload</p>
+                <input type="file" id="image_file" name="image_file" accept="image/*,video/*" style="display:none" />
             </div>
             <div id="file-info"></div>
+            <div id="preview"></div>
             <label for="caption">Caption</label>
             <input type="text" id="caption" name="caption" required />
             <button type="button" id="suggest_btn">Suggest Captions</button>
@@ -46,6 +47,7 @@
         const dropArea = document.getElementById('drop-area');
     const fileInput = document.getElementById('image_file');
     const fileInfo = document.getElementById('file-info');
+    const previewEl = document.getElementById('preview');
     const sourceRadios = document.getElementsByName('image_source');
     const imageUrlInput = document.getElementById('image_url');
     const suggestBtn = document.getElementById('suggest_btn');
@@ -56,9 +58,11 @@
             if (radio.value === 'url' && radio.checked) {
                 imageUrlInput.style.display = 'block';
                 dropArea.style.display = 'none';
+                updatePreview();
             } else if (radio.value === 'file' && radio.checked) {
                 imageUrlInput.style.display = 'none';
                 dropArea.style.display = 'block';
+                updatePreview();
             }
         });
     });
@@ -66,9 +70,32 @@
     function updateFileInfo(files) {
         if (files && files.length > 0) {
             fileInfo.textContent = files[0].name;
+            updatePreview();
         } else {
             fileInfo.textContent = '';
+            previewEl.innerHTML = '';
         }
+    }
+
+    function updatePreview() {
+        previewEl.innerHTML = '';
+        let src = null;
+        let isVideo = false;
+        if (document.querySelector('input[name="image_source"]:checked').value === 'url') {
+            src = imageUrlInput.value;
+            isVideo = /\.(mp4|mov|avi|webm)$/i.test(src);
+        } else {
+            const file = fileInput.files[0];
+            if (file) {
+                src = URL.createObjectURL(file);
+                isVideo = file.type.startsWith('video');
+            }
+        }
+        if (!src) return;
+        const el = document.createElement(isVideo ? 'video' : 'img');
+        el.src = src;
+        if (isVideo) el.controls = true;
+        previewEl.appendChild(el);
     }
 
     dropArea.addEventListener('click', () => fileInput.click());
@@ -91,6 +118,7 @@
         updateFileInfo(fileInput.files);
     });
     fileInput.addEventListener('change', () => updateFileInfo(fileInput.files));
+    imageUrlInput.addEventListener('input', updatePreview);
 
     suggestBtn.addEventListener('click', async () => {
         let imgSrc = null;
