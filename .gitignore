@@ -24,3 +24,4 @@ scheduled_posts.json
 
 # macOS system files
 .DS_Store
+.env.example
