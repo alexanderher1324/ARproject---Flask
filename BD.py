@@ -6,6 +6,7 @@ from flask_wtf import CSRFProtect
 from flask_login import LoginManager, login_required, current_user
 from authlib.integrations.flask_client import OAuth
 import openai
+from moviepy.video.io.VideoFileClip import VideoFileClip
 from openai import RateLimitError, APIError, APIConnectionError, APITimeoutError
 import time
 from auth import auth
@@ -22,12 +23,8 @@ if not os.getenv("SECRET_KEY") and Path(".env.example").exists():
 app = Flask(__name__, template_folder='UI')
 # Removed redundant load_dotenv() call to avoid conflicts
 app.config['UPLOAD_FOLDER'] = os.path.join('static', 'uploads')
-# Allow common image and video extensions so users can upload
-# pictures or short clips for scheduled posts.
-ALLOWED_EXTENSIONS = {
-    'png', 'jpg', 'jpeg', 'gif',
-    'mp4', 'mov', 'avi', 'webm'
-}
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+ALLOWED_VIDEO_EXTENSIONS = {'mp4', 'mov', 'avi', 'mkv'}
 
 oauth = OAuth(app)
 oauth.register(
@@ -244,6 +241,42 @@ def schedule_post():
 def view_past_posts():
     posts = Post.query.filter_by(user_id=current_user.id).order_by(Post.scheduled_time.desc()).all()
     return render_template('past_posts.html', posts=posts)
+
+
+@app.route('/video_tools', methods=['GET', 'POST'])
+@login_required
+def video_tools():
+    short_video_url = None
+    thumbnail_url = None
+    if request.method == 'POST':
+        video_file = request.files.get('video_file')
+        if video_file and video_file.filename:
+            ext = video_file.filename.rsplit('.', 1)[-1].lower()
+            if ext in ALLOWED_VIDEO_EXTENSIONS:
+                filename = f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{secure_filename(video_file.filename)}"
+                os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+                file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                video_file.save(file_path)
+                clip = VideoFileClip(file_path)
+                duration = clip.duration
+                short_clip = clip.subclipped(0, min(20, duration))
+                short_name = f"short_{filename}"
+                short_path = os.path.join(app.config['UPLOAD_FOLDER'], short_name)
+                short_clip.write_videofile(short_path, codec='libx264', audio_codec='aac', logger=None)
+                thumb_name = f"thumb_{os.path.splitext(filename)[0]}.jpg"
+                thumb_path = os.path.join(app.config['UPLOAD_FOLDER'], thumb_name)
+                clip.save_frame(thumb_path, t=min(1, duration))
+                clip.close()
+                short_clip.close()
+                short_video_url = url_for('static', filename=f'uploads/{short_name}')
+                thumbnail_url = url_for('static', filename=f'uploads/{thumb_name}')
+            else:
+                flash('Unsupported video type.')
+                return redirect(url_for('video_tools'))
+        else:
+            flash('No video uploaded.')
+            return redirect(url_for('video_tools'))
+    return render_template('video_tools.html', short_video_url=short_video_url, thumbnail_url=thumbnail_url)
 
 
 with app.app_context():
