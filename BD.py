@@ -86,23 +86,10 @@ def dashboard():
                            instagram_connected=instagram_connected,
                            tiktok_connected=tiktok_connected)
 
-@app.route('/connect', methods=['GET', 'POST'])
+@app.route('/connect')
 @login_required
 def connect_accounts():
-    if request.method == 'POST':
-        current_user.instagram_access_token = request.form.get('instagram_token')
-        current_user.ig_user_id = request.form.get('instagram_user_id')
-        current_user.tiktok_access_token = request.form.get('tiktok_token')
-        current_user.tiktok_user_id = request.form.get('tiktok_user_id')
-        db.session.commit()
-        flash('Accounts connected!')
-        return redirect(url_for('dashboard'))
-
-    return render_template('connect_accounts.html',
-                           instagram_token=current_user.instagram_access_token,
-                           instagram_user_id=current_user.ig_user_id,
-                           tiktok_token=current_user.tiktok_access_token,
-                           tiktok_user_id=current_user.tiktok_user_id)
+    return render_template('connect_accounts.html')
 
 @app.route('/oauth/instagram')
 @login_required
