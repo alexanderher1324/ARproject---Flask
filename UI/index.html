@@ -12,15 +12,15 @@
 
         {% if current_user.is_authenticated %}
             <p>Hello, {{ current_user.username }}!</p>
-            <a href="{{ url_for('dashboard') }}">Go to Dashboard</a>
+            <a href="{{ url_for('dashboard') }}" class="btn-link">Go to Dashboard</a>
             <form method="POST" action="{{ url_for('auth.logout') }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                 <button type="submit">Logout</button>
             </form>
         {% else %}
             <p>Please login or register to access your dashboard.</p>
-            <a href="{{ url_for('auth.login') }}">Login</a>
-            <a href="{{ url_for('auth.register') }}">Register</a>
+            <a href="{{ url_for('auth.login') }}" class="btn-link">Login</a>
+            <a href="{{ url_for('auth.register') }}" class="btn-link">Register</a>
         {% endif %}
     </div>
 </body>

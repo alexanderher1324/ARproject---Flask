@@ -89,12 +89,16 @@ nav ul {
   gap: 1rem;
 }
 nav a {
-  color: #00bcd4;
+  display: inline-block;
+  background: #f39c12;
+  color: #111;
   text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
   font-weight: 600;
 }
 nav a:hover {
-  text-decoration: underline;
+  background: #d98f0a;
 }
 
 .top-nav {
@@ -123,12 +127,42 @@ nav a:hover {
   font-size: 0.9rem;
 }
 .link a {
-  color: #00bcd4;
+  display: inline-block;
+  background: #f39c12;
+  color: #111;
   text-decoration: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
   font-weight: 600;
 }
 .link a:hover {
-  text-decoration: underline;
+  background: #d98f0a;
+}
+
+.btn-link {
+  display: inline-block;
+  background: #f39c12;
+  color: #111;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 600;
+}
+.btn-link:hover {
+  background: #d98f0a;
+}
+
+.oauth-btn {
+  display: inline-block;
+  background: #f39c12;
+  color: #111;
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 600;
+}
+.oauth-btn:hover {
+  background: #d98f0a;
 }
 
 #drop-area {
