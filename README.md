@@ -3,8 +3,8 @@
 A Flask-based social media scheduler web app that allows users to:
 
 ✅ Register / Login with email and password confirmation
-✅ Connect Instagram or TikTok accounts
-✅ Schedule posts for either platform
+✅ Connect Instagram, TikTok or YouTube accounts
+✅ Schedule posts for any platform
 ✅ View past posts
 ✅ Upload videos to generate a thumbnail and 20-second preview
 ✅ Secure CSRF-protected login/logout flow
@@ -36,6 +36,9 @@ A Flask-based social media scheduler web app that allows users to:
    - `SECRET_KEY` – **required** secret key for Flask sessions. The app exits if this is not provided.
    - `DATABASE_URL` – (optional) SQLAlchemy connection string. Defaults to SQLite `app.db`.
    - `OPENAI_API_KEY` – (optional) enables automatic caption suggestions.
+   - `INSTAGRAM_CLIENT_ID` and `INSTAGRAM_CLIENT_SECRET` – enable Instagram OAuth.
+   - `TIKTOK_CLIENT_KEY` and `TIKTOK_CLIENT_SECRET` – enable TikTok OAuth.
+   - `YOUTUBE_CLIENT_ID` and `YOUTUBE_CLIENT_SECRET` – enable YouTube OAuth.
 4. Run the development server:
    ```bash
    python BD.py
@@ -63,6 +66,6 @@ The dashboard and authentication pages are under the `UI` folder.
 ## Connecting social accounts
 
 Open the **Connect Social Accounts** page from the dashboard and use the
-provided buttons to authorize Instagram or TikTok via OAuth. After you approve
-access, the obtained tokens are stored automatically and the dashboard will show
-the platforms as connected.
+provided buttons to authorize Instagram, TikTok or YouTube via OAuth. After you
+approve access, the obtained tokens are stored automatically and the dashboard
+will show the platforms as connected.
