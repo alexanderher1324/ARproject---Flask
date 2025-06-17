@@ -14,7 +14,8 @@ body {
   align-items: center;
   min-height: 100vh;
   padding-top: 4rem;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 .container {
   background: rgba(255, 255, 255, 0.05);
