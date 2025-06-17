@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Analytics</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container">
+    <h2>Analytics - {{ platform.capitalize() }}</h2>
+    <form method="get" action="{{ url_for('analytics') }}">
+        <label for="platform">Platform</label>
+        <select name="platform" id="platform" onchange="this.form.submit()">
+            <option value="instagram" {% if platform == 'instagram' %}selected{% endif %}>Instagram</option>
+            <option value="tiktok" {% if platform == 'tiktok' %}selected{% endif %}>TikTok</option>
+            <option value="youtube" {% if platform == 'youtube' %}selected{% endif %}>YouTube</option>
+        </select>
+    </form>
+
+    <h3>Follower Growth</h3>
+    {% if follower_data %}
+        <ul>
+        {% for f in follower_data %}
+            <li>{{ f.timestamp.strftime('%Y-%m-%d') }}: {{ f.followers }}</li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No follower data.</p>
+    {% endif %}
+
+    <h3>Posts</h3>
+    {% if posts %}
+        <ul>
+        {% for post in posts %}
+            <li>
+                {{ post.caption }} - Likes: {{ post.likes }} Comments: {{ post.comments }} Shares: {{ post.shares }} Saves: {{ post.saves }}
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No posts for this platform.</p>
+    {% endif %}
+
+    <h3>Top Posts</h3>
+    {% if top_posts %}
+        <ol>
+        {% for post in top_posts %}
+            <li>{{ post.caption }} ({{ (post.likes + post.comments + post.shares + post.saves) }})</li>
+        {% endfor %}
+        </ol>
+    {% else %}
+        <p>No top posts.</p>
+    {% endif %}
+
+    <div class="link"><a href="{{ url_for('dashboard') }}">Back to Dashboard</a></div>
+</div>
+</body>
+</html>

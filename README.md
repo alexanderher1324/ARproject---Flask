@@ -6,6 +6,7 @@ A Flask-based social media scheduler web app that allows users to:
 ✅ Connect Instagram, TikTok or YouTube accounts
 ✅ Schedule posts for any platform
 ✅ View past posts
+✅ Track post analytics and follower growth
 ✅ Upload videos to generate a thumbnail and 20-second preview
 ✅ Secure CSRF-protected login/logout flow
 ✅ Background scheduler for automated posting
@@ -69,3 +70,9 @@ Open the **Connect Social Accounts** page from the dashboard and use the
 provided buttons to authorize Instagram, TikTok or YouTube via OAuth. After you
 approve access, the obtained tokens are stored automatically and the dashboard
 will show the platforms as connected.
+
+## Analytics
+
+Use the **Analytics** tab on the dashboard to view engagement for your posts and
+track follower counts over time. Choose the desired platform from the dropdown
+menu to filter results.
