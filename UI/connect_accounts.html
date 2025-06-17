@@ -9,11 +9,12 @@
 <body>
     <div class="container">
         <h2>Connect Social Accounts</h2>
-        <p class="instructions">Use the buttons below to authorize Instagram and TikTok.</p>
+        <p class="instructions">Use the buttons below to authorize Instagram, TikTok and YouTube.</p>
 
         <div class="oauth-buttons">
             <a href="{{ url_for('oauth_instagram') }}" class="oauth-btn">Connect Instagram via OAuth</a>
             <a href="{{ url_for('oauth_tiktok') }}" class="oauth-btn">Connect TikTok via OAuth</a>
+            <a href="{{ url_for('oauth_youtube') }}" class="oauth-btn">Connect YouTube via OAuth</a>
         </div>
 
         {% with messages = get_flashed_messages() %}

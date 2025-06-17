@@ -45,6 +45,18 @@ oauth.register(
     client_kwargs={'scope': 'user.info.basic,video.list'}
 )
 
+oauth.register(
+    name='youtube',
+    client_id=os.getenv('YOUTUBE_CLIENT_ID'),
+    client_secret=os.getenv('YOUTUBE_CLIENT_SECRET'),
+    access_token_url='https://oauth2.googleapis.com/token',
+    authorize_url='https://accounts.google.com/o/oauth2/v2/auth',
+    api_base_url='https://www.googleapis.com',
+    client_kwargs={'scope': 'https://www.googleapis.com/auth/youtube.readonly openid email',
+                   'prompt': 'consent'},
+    authorize_params={'access_type': 'offline'}
+)
+
 SECRET_KEY = os.getenv('SECRET_KEY')
 if not SECRET_KEY:
     raise RuntimeError("SECRET_KEY environment variable not set")
@@ -83,10 +95,12 @@ def index():
 def dashboard():
     instagram_connected = bool(current_user.instagram_access_token)
     tiktok_connected = bool(current_user.tiktok_access_token)
+    youtube_connected = bool(current_user.youtube_access_token)
     return render_template('dashboard.html',
                            username=current_user.username,
                            instagram_connected=instagram_connected,
-                           tiktok_connected=tiktok_connected)
+                           tiktok_connected=tiktok_connected,
+                           youtube_connected=youtube_connected)
 
 @app.route('/connect')
 @login_required
@@ -126,6 +140,32 @@ def tiktok_callback():
     current_user.tiktok_user_id = token.get('open_id')
     db.session.commit()
     flash('TikTok connected!')
+    return redirect(url_for('dashboard'))
+
+
+@app.route('/oauth/youtube')
+@login_required
+def oauth_youtube():
+    redirect_uri = url_for('youtube_callback', _external=True)
+    return oauth.youtube.authorize_redirect(redirect_uri)
+
+
+@app.route('/oauth/youtube/callback')
+@login_required
+def youtube_callback():
+    token = oauth.youtube.authorize_access_token()
+    current_user.youtube_access_token = token.get('access_token')
+    current_user.youtube_refresh_token = token.get('refresh_token')
+    # fetch channel id
+    resp = oauth.youtube.get('https://www.googleapis.com/youtube/v3/channels',
+                             params={'part': 'id', 'mine': 'true'},
+                             token=token)
+    if resp.ok:
+        data = resp.json()
+        if data.get('items'):
+            current_user.youtube_channel_id = data['items'][0]['id']
+    db.session.commit()
+    flash('YouTube connected!')
     return redirect(url_for('dashboard'))
 
 
@@ -220,6 +260,9 @@ def schedule_post():
                 return redirect(url_for('connect_accounts'))
             if platform == 'tiktok' and not current_user.tiktok_access_token:
                 flash('Please connect your TikTok account first.')
+                return redirect(url_for('connect_accounts'))
+            if platform == 'youtube' and not current_user.youtube_access_token:
+                flash('Please connect your YouTube account first.')
                 return redirect(url_for('connect_accounts'))
 
             new_post = Post(user_id=current_user.id,

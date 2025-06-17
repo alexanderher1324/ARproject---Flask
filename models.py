@@ -13,6 +13,9 @@ class User(UserMixin, db.Model):
     ig_user_id = db.Column(db.String(100))
     tiktok_access_token = db.Column(db.String(500))
     tiktok_user_id = db.Column(db.String(100))
+    youtube_access_token = db.Column(db.String(500))
+    youtube_refresh_token = db.Column(db.String(500))
+    youtube_channel_id = db.Column(db.String(100))
 
     def set_password(self, password):
         from werkzeug.security import generate_password_hash
