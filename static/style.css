@@ -14,6 +14,7 @@ body {
   align-items: center;
   min-height: 100vh;
   padding-top: 4rem;
+  overflow: hidden;
 }
 .container {
   background: rgba(255, 255, 255, 0.05);
@@ -214,4 +215,24 @@ nav a:hover {
   display: flex;
   gap: 0.5rem;
   margin-bottom: 1rem;
+}
+
+/* Bouncing text on dashboard */
+.bouncing-text {
+  position: fixed;
+  top: 0;
+  left: 0;
+  font-size: 2rem;
+  font-weight: bold;
+  pointer-events: none;
+  animation: moveAround 30s linear infinite;
+  white-space: nowrap;
+}
+
+@keyframes moveAround {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(calc(100vw - 100%), 0); }
+  50% { transform: translate(calc(100vw - 100%), calc(100vh - 100%)); }
+  75% { transform: translate(0, calc(100vh - 100%)); }
+  100% { transform: translate(0, 0); }
 }
