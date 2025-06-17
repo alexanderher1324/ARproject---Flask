@@ -10,7 +10,7 @@ from moviepy.video.io.VideoFileClip import VideoFileClip
 from openai import RateLimitError, APIError, APIConnectionError, APITimeoutError
 import time
 from auth import auth
-from models import db, User, Post
+from models import db, User, Post, FollowerTrend
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -284,6 +284,17 @@ def schedule_post():
 def view_past_posts():
     posts = Post.query.filter_by(user_id=current_user.id).order_by(Post.scheduled_time.desc()).all()
     return render_template('past_posts.html', posts=posts)
+
+
+@app.route('/analytics')
+@login_required
+def analytics():
+    platform = request.args.get('platform', 'instagram')
+    posts = Post.query.filter_by(user_id=current_user.id, platform=platform).all()
+    follower_data = FollowerTrend.query.filter_by(user_id=current_user.id, platform=platform).order_by(FollowerTrend.timestamp).all()
+    top_posts = sorted(posts, key=lambda p: (p.likes or 0) + (p.comments or 0) + (p.shares or 0) + (p.saves or 0), reverse=True)[:3]
+    return render_template('analytics.html', posts=posts, follower_data=follower_data,
+                           platform=platform, top_posts=top_posts)
 
 
 @app.route('/video_tools', methods=['GET', 'POST'])

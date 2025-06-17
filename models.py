@@ -34,5 +34,19 @@ class Post(db.Model):
     scheduled_time = db.Column(db.DateTime, default=datetime.utcnow)
     posted = db.Column(db.Boolean, default=False)
     platform = db.Column(db.String(50), default='instagram', nullable=False)
+    likes = db.Column(db.Integer, default=0)
+    comments = db.Column(db.Integer, default=0)
+    shares = db.Column(db.Integer, default=0)
+    saves = db.Column(db.Integer, default=0)
 
     user = db.relationship('User', backref='posts')
+
+
+class FollowerTrend(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    platform = db.Column(db.String(50), nullable=False)
+    followers = db.Column(db.Integer, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('User', backref='follower_trends')

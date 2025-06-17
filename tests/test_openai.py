@@ -4,6 +4,9 @@ from unittest.mock import patch, Mock
 import httpx
 import openai
 import pytest
+import sys
+import os as _os
+sys.path.insert(0, _os.path.abspath(_os.path.join(_os.path.dirname(__file__), '..')))
 
 # Set required environment variables before importing the app
 os.environ.setdefault('SECRET_KEY', 'test-secret')
