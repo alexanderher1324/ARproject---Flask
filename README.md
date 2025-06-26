@@ -62,6 +62,9 @@ For production setups you would normally use a migration tool such as
 [Flask-Migrate](https://flask-migrate.readthedocs.io/) instead of deleting the
 database.
 
+All timestamps stored in the database are saved in **UTC** for consistency
+across deployments.
+
 The dashboard and authentication pages are under the `UI` folder.
 
 ## Connecting social accounts

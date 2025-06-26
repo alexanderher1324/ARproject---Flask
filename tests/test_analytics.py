@@ -1,5 +1,5 @@
 import os
-from datetime import datetime
+from datetime import datetime, UTC
 import pytest
 import sys
 import os as _os
@@ -24,8 +24,10 @@ def client():
         user_id = user.id
         post = BD.Post(user_id=user_id, caption='post1', platform='instagram', likes=10, comments=5, shares=1, saves=2)
         BD.db.session.add(post)
-        trend1 = BD.FollowerTrend(user_id=user.id, platform='instagram', followers=100, timestamp=datetime(2024,1,1))
-        trend2 = BD.FollowerTrend(user_id=user.id, platform='instagram', followers=120, timestamp=datetime(2024,1,2))
+        trend1 = BD.FollowerTrend(user_id=user.id, platform='instagram', followers=100,
+                                  timestamp=datetime(2024, 1, 1, tzinfo=UTC))
+        trend2 = BD.FollowerTrend(user_id=user.id, platform='instagram', followers=120,
+                                  timestamp=datetime(2024, 1, 2, tzinfo=UTC))
         BD.db.session.add_all([trend1, trend2])
         BD.db.session.commit()
     with BD.app.test_client() as client:
