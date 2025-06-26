@@ -44,7 +44,11 @@ A Flask-based social media scheduler web app that allows users to:
    ```bash
    python BD.py
    ```
-5. Open your browser at `http://localhost:5000`.
+5. For production deployments, start the app with Gunicorn:
+   ```bash
+   gunicorn BD:app
+   ```
+6. Open your browser at `http://localhost:5000` (or `http://localhost:8000` if using Gunicorn).
 
 ### Updating the database schema
 
