@@ -188,12 +188,16 @@ nav a:hover {
 }
 
 #preview {
-  text-align: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
   margin-bottom: 1rem;
+  text-align: center;
 }
 #preview img,
 #preview video {
-  max-width: 100%;
+  max-width: 150px;
   border-radius: 8px;
 }
 
