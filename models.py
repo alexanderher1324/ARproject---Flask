@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
-from datetime import datetime
+from datetime import datetime, UTC
 
 db = SQLAlchemy()
 
@@ -31,7 +31,10 @@ class Post(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     caption = db.Column(db.String(2200))
     image_url = db.Column(db.String(500))
-    scheduled_time = db.Column(db.DateTime, default=datetime.utcnow)
+    scheduled_time = db.Column(
+        db.DateTime(timezone=True),
+        default=lambda: datetime.now(UTC)
+    )
     posted = db.Column(db.Boolean, default=False)
     platform = db.Column(db.String(50), default='instagram', nullable=False)
     likes = db.Column(db.Integer, default=0)
@@ -47,6 +50,9 @@ class FollowerTrend(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     platform = db.Column(db.String(50), nullable=False)
     followers = db.Column(db.Integer, nullable=False)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    timestamp = db.Column(
+        db.DateTime(timezone=True),
+        default=lambda: datetime.now(UTC)
+    )
 
     user = db.relationship('User', backref='follower_trends')
