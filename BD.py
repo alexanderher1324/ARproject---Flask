@@ -302,8 +302,14 @@ def analytics():
 def video_tools():
     short_video_url = None
     thumbnail_url = None
+    clip_length = 20
     if request.method == 'POST':
         video_file = request.files.get('video_file')
+        clip_start = float(request.form.get('clip_start', 0))
+        clip_length = int(request.form.get('clip_length', 20))
+        thumb_time = float(request.form.get('thumbnail_time', 1))
+        if clip_length not in (10, 20, 30):
+            clip_length = 20
         if video_file and video_file.filename:
             ext = video_file.filename.rsplit('.', 1)[-1].lower()
             if ext in ALLOWED_VIDEO_EXTENSIONS:
@@ -313,13 +319,15 @@ def video_tools():
                 video_file.save(file_path)
                 clip = VideoFileClip(file_path)
                 duration = clip.duration
-                short_clip = clip.subclipped(0, min(20, duration))
+                start = max(0, min(clip_start, duration))
+                end = min(start + clip_length, duration)
+                short_clip = clip.subclipped(start, end)
                 short_name = f"short_{filename}"
                 short_path = os.path.join(app.config['UPLOAD_FOLDER'], short_name)
                 short_clip.write_videofile(short_path, codec='libx264', audio_codec='aac', logger=None)
                 thumb_name = f"thumb_{os.path.splitext(filename)[0]}.jpg"
                 thumb_path = os.path.join(app.config['UPLOAD_FOLDER'], thumb_name)
-                clip.save_frame(thumb_path, t=min(1, duration))
+                clip.save_frame(thumb_path, t=min(thumb_time, duration))
                 clip.close()
                 short_clip.close()
                 short_video_url = url_for('static', filename=f'uploads/{short_name}')
@@ -330,7 +338,8 @@ def video_tools():
         else:
             flash('No video uploaded.')
             return redirect(url_for('video_tools'))
-    return render_template('video_tools.html', short_video_url=short_video_url, thumbnail_url=thumbnail_url)
+    return render_template('video_tools.html', short_video_url=short_video_url,
+                           thumbnail_url=thumbnail_url, clip_length=clip_length)
 
 
 with app.app_context():

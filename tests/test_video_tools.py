@@ -21,7 +21,7 @@ def client():
         yield client
 
 def _create_sample_video(path):
-    clip = ColorClip(size=(64, 64), color=(255, 0, 0), duration=1)
+    clip = ColorClip(size=(64, 64), color=(255, 0, 0), duration=2)
     clip.write_videofile(path, fps=24, codec='libx264', audio=False, logger=None)
     clip.close()
 
@@ -35,10 +35,15 @@ def test_video_processing(client, tmp_path):
     video_path = tmp_path / 'vid.mp4'
     _create_sample_video(str(video_path))
     with open(video_path, 'rb') as f:
-        data = {'video_file': (f, 'vid.mp4')}
+        data = {
+            'video_file': (f, 'vid.mp4'),
+            'clip_start': '0',
+            'clip_length': '10',
+            'thumbnail_time': '0'
+        }
         resp = client.post('/video_tools', data=data, content_type='multipart/form-data')
     assert resp.status_code == 200
-    assert b'20-second Clip' in resp.data
+    assert b'10-second Clip' in resp.data
     files = os.listdir(os.path.join('static', 'uploads'))
     assert any(name.startswith('short_') for name in files)
     assert any(name.startswith('thumb_') for name in files)
