@@ -20,7 +20,7 @@
             <input type="text" id="image_url" name="image_url" placeholder="Paste image URL" />
             <div id="drop-area" style="display:none">
                 <p>Drag & Drop Media Here or Click to Upload</p>
-                <input type="file" id="image_file" name="image_file" accept="image/*,video/*" style="display:none" />
+                <input type="file" id="image_file" name="image_file" multiple accept="image/*,video/*" style="display:none" />
             </div>
             <div id="file-info"></div>
             <div id="preview"></div>
@@ -71,7 +71,7 @@
 
     function updateFileInfo(files) {
         if (files && files.length > 0) {
-            fileInfo.textContent = files[0].name;
+            fileInfo.textContent = files.length === 1 ? files[0].name : `${files[0].name} (+${files.length - 1} more)`;
             updatePreview();
         } else {
             fileInfo.textContent = '';
@@ -116,8 +116,13 @@
         });
     });
     dropArea.addEventListener('drop', e => {
-        fileInput.files = e.dataTransfer.files;
-        updateFileInfo(fileInput.files);
+        e.preventDefault();
+        e.stopPropagation();
+        dropArea.classList.remove('highlight');
+        if (e.dataTransfer.files.length > 0) {
+            fileInput.files = e.dataTransfer.files;
+            updateFileInfo(fileInput.files);
+        }
     });
     fileInput.addEventListener('change', () => updateFileInfo(fileInput.files));
     imageUrlInput.addEventListener('input', updatePreview);
