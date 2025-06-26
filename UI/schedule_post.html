@@ -46,7 +46,7 @@
 </body>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
-        const dropArea = document.getElementById('drop-area');
+    const dropArea = document.getElementById('drop-area');
     const fileInput = document.getElementById('image_file');
     const fileInfo = document.getElementById('file-info');
     const previewEl = document.getElementById('preview');
@@ -54,6 +54,22 @@
     const imageUrlInput = document.getElementById('image_url');
     const suggestBtn = document.getElementById('suggest_btn');
     const suggestionsEl = document.getElementById('suggestions');
+    const selectedFiles = [];
+
+    function refreshFileInput() {
+        const dt = new DataTransfer();
+        selectedFiles.forEach(f => dt.items.add(f));
+        fileInput.files = dt.files;
+    }
+
+    function addFiles(files) {
+        for (const file of files) {
+            selectedFiles.push(file);
+        }
+        refreshFileInput();
+        updateFileInfo();
+        updatePreview();
+    }
 
     sourceRadios.forEach(radio => {
         radio.addEventListener('change', () => {
@@ -69,35 +85,35 @@
         });
     });
 
-    function updateFileInfo(files) {
-        if (files && files.length > 0) {
-            fileInfo.textContent = files.length === 1 ? files[0].name : `${files[0].name} (+${files.length - 1} more)`;
-            updatePreview();
+    function updateFileInfo() {
+        if (selectedFiles.length > 0) {
+            fileInfo.textContent = selectedFiles.length === 1 ?
+                selectedFiles[0].name : `${selectedFiles[0].name} (+${selectedFiles.length - 1} more)`;
         } else {
             fileInfo.textContent = '';
-            previewEl.innerHTML = '';
         }
     }
 
     function updatePreview() {
         previewEl.innerHTML = '';
-        let src = null;
-        let isVideo = false;
         if (document.querySelector('input[name="image_source"]:checked').value === 'url') {
-            src = imageUrlInput.value;
-            isVideo = /\.(mp4|mov|avi|webm)$/i.test(src);
-        } else {
-            const file = fileInput.files[0];
-            if (file) {
-                src = URL.createObjectURL(file);
-                isVideo = file.type.startsWith('video');
-            }
+            const src = imageUrlInput.value;
+            if (!src) return;
+            const isVideo = /\.(mp4|mov|avi|webm)$/i.test(src);
+            const el = document.createElement(isVideo ? 'video' : 'img');
+            el.src = src;
+            if (isVideo) el.controls = true;
+            previewEl.appendChild(el);
+            return;
         }
-        if (!src) return;
-        const el = document.createElement(isVideo ? 'video' : 'img');
-        el.src = src;
-        if (isVideo) el.controls = true;
-        previewEl.appendChild(el);
+        selectedFiles.forEach(file => {
+            const src = URL.createObjectURL(file);
+            const isVideo = file.type.startsWith('video');
+            const el = document.createElement(isVideo ? 'video' : 'img');
+            el.src = src;
+            if (isVideo) el.controls = true;
+            previewEl.appendChild(el);
+        });
     }
 
     dropArea.addEventListener('click', () => fileInput.click());
@@ -120,11 +136,15 @@
         e.stopPropagation();
         dropArea.classList.remove('highlight');
         if (e.dataTransfer.files.length > 0) {
-            fileInput.files = e.dataTransfer.files;
-            updateFileInfo(fileInput.files);
+            addFiles(e.dataTransfer.files);
         }
     });
-    fileInput.addEventListener('change', () => updateFileInfo(fileInput.files));
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files.length > 0) {
+            addFiles(fileInput.files);
+            fileInput.value = '';
+        }
+    });
     imageUrlInput.addEventListener('input', updatePreview);
 
     suggestBtn.addEventListener('click', async () => {
@@ -132,7 +152,7 @@
         if (document.querySelector('input[name="image_source"]:checked').value === 'url') {
             imgSrc = imageUrlInput.value;
         } else {
-            const file = fileInput.files[0];
+            const file = selectedFiles[0];
             if (file) {
                 imgSrc = await new Promise(resolve => {
                     const reader = new FileReader();
