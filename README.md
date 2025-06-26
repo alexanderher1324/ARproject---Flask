@@ -7,7 +7,7 @@ A Flask-based social media scheduler web app that allows users to:
 ✅ Schedule posts for any platform
 ✅ View past posts
 ✅ Track post analytics and follower growth
-✅ Upload videos to generate a thumbnail and 20-second preview
+✅ Upload videos to generate a thumbnail and custom preview clip (10/20/30 seconds)
 ✅ Secure CSRF-protected login/logout flow
 ✅ Background scheduler for automated posting
 

@@ -12,6 +12,22 @@
     <form method="POST" enctype="multipart/form-data">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
         <input type="file" name="video_file" accept="video/*" required />
+        <label>
+            Thumbnail time (s):
+            <input type="number" name="thumbnail_time" value="1" min="0" step="0.1" />
+        </label>
+        <label>
+            Clip start (s):
+            <input type="number" name="clip_start" value="0" min="0" step="0.1" />
+        </label>
+        <label>
+            Clip length:
+            <select name="clip_length">
+                <option value="10">10 seconds</option>
+                <option value="20" selected>20 seconds</option>
+                <option value="30">30 seconds</option>
+            </select>
+        </label>
         <button type="submit">Upload</button>
     </form>
     {% if thumbnail_url %}
@@ -19,7 +35,7 @@
     <img src="{{ thumbnail_url }}" alt="Thumbnail" style="max-width: 100%;" />
     {% endif %}
     {% if short_video_url %}
-    <h3>20-second Clip</h3>
+    <h3>{{ clip_length }}-second Clip</h3>
     <video src="{{ short_video_url }}" controls style="max-width: 100%;"></video>
     {% endif %}
     <div class="link"><a href="{{ url_for('dashboard') }}">Back to Dashboard</a></div>
