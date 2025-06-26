@@ -228,7 +228,24 @@ def schedule_post():
     if request.method == 'POST':
         caption = request.form.get('caption')
         image_url = request.form.get('image_url')
-        uploaded_file = request.files.get('image_file')
+        uploaded_files = [f for f in request.files.getlist('image_file') if f and f.filename]
+        image_urls = []
+        if uploaded_files:
+            for uploaded_file in uploaded_files:
+                extension = uploaded_file.filename.rsplit('.', 1)[-1].lower()
+                if extension in ALLOWED_EXTENSIONS or extension in ALLOWED_VIDEO_EXTENSIONS:
+                    filename = f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{secure_filename(uploaded_file.filename)}"
+                    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+                    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                    uploaded_file.save(file_path)
+                    image_urls.append(url_for('static', filename=f'uploads/{filename}'))
+                else:
+                    flash('Unsupported file type.')
+                    return redirect(url_for('schedule_post'))
+        elif image_url:
+            image_urls.append(image_url)
+        if not image_urls:
+            image_urls.append(None)
         date_str = request.form.get('scheduled_date')
         time_str = request.form.get('scheduled_time')
         platforms = request.form.getlist('platforms')
@@ -238,17 +255,6 @@ def schedule_post():
             flash('Invalid date/time format.')
             return redirect(url_for('schedule_post'))
         
-        if uploaded_file and uploaded_file.filename:
-            extension = uploaded_file.filename.rsplit('.', 1)[-1].lower()
-            if extension in ALLOWED_EXTENSIONS:
-                filename = f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{secure_filename(uploaded_file.filename)}"
-                os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-                file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                uploaded_file.save(file_path)
-                image_url = url_for('static', filename=f'uploads/{filename}')
-            else:
-                flash('Unsupported file type.')
-                return redirect(url_for('schedule_post'))
 
         if not platforms:
             flash('Please select at least one platform.')
@@ -265,12 +271,13 @@ def schedule_post():
                 flash('Please connect your YouTube account first.')
                 return redirect(url_for('connect_accounts'))
 
-            new_post = Post(user_id=current_user.id,
-                            caption=caption,
-                            image_url=image_url,
-                            scheduled_time=scheduled_time,
-                            platform=platform)
-            db.session.add(new_post)
+            for url in image_urls:
+                new_post = Post(user_id=current_user.id,
+                                caption=caption,
+                                image_url=url,
+                                scheduled_time=scheduled_time,
+                                platform=platform)
+                db.session.add(new_post)
 
         db.session.commit()
         flash('Post scheduled successfully!')
